@@ -16,8 +16,12 @@
 #' @param wavelen Wavelength in the unit of \[nm\]
 #' @param A_d Scaled albedo parameters of detritus
 #' @param G_d Power law exponent of spectral attenuation of detritus
-#' @param lib_cdom Option to use the library of CDOM absorption. Default as \code{TRUE}
-#' @param aw_smooth Option to smooth the pure water absorption. Default as \code{FALSE}
+#' @param lib_cdom Option to use the library of CDOM absorption. Default as
+#'   \code{TRUE}
+#' @param aw_smooth Option to smooth the pure water absorption. Default as
+#'   \code{FALSE}
+#' @param ag_seed Random seed for ag model. Default as 1234. Fixed to reproduce
+#'   the same outputs.
 #' @param ... Parameters passed to \code{IOP_ph_B22_C2}
 #'
 #' @return A list including spectral of IOPs and key parameters
@@ -41,11 +45,13 @@ IOP_four_comp <- function(
     A_d = NULL, G_d = NULL,
     lib_cdom = TRUE,
     aw_smooth = FALSE,
+    ag_seed = 1234,
     ...
 ) {
 
   # spectra
-  list_d     <- IOP_d_B22_C2(ISM, Chl, qt_bd = qt_bd, qt_md = qt_md, wavelen = wavelen,
+  list_d     <- IOP_d_B22_C2(ISM, Chl, qt_bd = qt_bd, qt_md = qt_md,
+                             wavelen = wavelen,
                              A = A_d, G = G_d)
   list_ph    <- IOP_ph_B22_C2(Chl, frac_phyto, wavelen = wavelen, ...)
 
@@ -56,7 +62,7 @@ IOP_four_comp <- function(
   }
 
   if(lib_cdom) {
-    list_cdom <- IOP_cdom_B22_C2_lib(ag440, wavelen = wavelen)
+    list_cdom <- IOP_cdom_B22_C2_lib(ag440, wavelen = wavelen, ag_seed = ag_seed)
   } else {
     list_cdom  <- IOP_cdom_B22_C2(ag440, S_cdom, wavelen = wavelen)
   }

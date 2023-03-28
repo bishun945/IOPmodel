@@ -518,8 +518,11 @@ IOP_cdom_B22_C2 <- function(
 #' @noRd
 IOP_cdom_B22_C2_lib <- function(
     ag440 = NULL,
-    wavelen = wavelen_IOP
+    wavelen = wavelen_IOP,
+    ag_seed = 1234
 ) {
+
+  set.seed(ag_seed)
 
   if(min(wavelen) < 354) {
     ag_norm <-

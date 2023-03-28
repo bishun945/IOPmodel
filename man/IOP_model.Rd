@@ -21,6 +21,7 @@ IOP_four_comp(
   G_d = NULL,
   lib_cdom = TRUE,
   aw_smooth = FALSE,
+  ag_seed = 1234,
   ...
 )
 
@@ -63,9 +64,14 @@ concentration of CDOM (or called gelbstoff), in the unit [m^-1]}
 
 \item{G_d}{Power law exponent of spectral attenuation of detritus}
 
-\item{lib_cdom}{Option to use the library of CDOM absorption. Default as \code{TRUE}}
+\item{lib_cdom}{Option to use the library of CDOM absorption. Default as
+\code{TRUE}}
 
-\item{aw_smooth}{Option to smooth the pure water absorption. Default as \code{FALSE}}
+\item{aw_smooth}{Option to smooth the pure water absorption. Default as
+\code{FALSE}}
+
+\item{ag_seed}{Random seed for ag model. Default as 1234. Fixed to reproduce
+the same outputs.}
 
 \item{...}{Parameters passed to \code{IOP_ph_B22_C2}}
 }
