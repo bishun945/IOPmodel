@@ -1,0 +1,195 @@
+#' Benchmark IOP models
+#'
+#' @param aph Absorption coefficient of phytoplankton in the unit of \[m^-1\]
+#' @param wavelen Wavelength in the unit of \[nm\] with the same length of \code{aph}
+#' @param rng1 Random value between 0 and 1
+#' @param rng2 Random value between 0 and 1
+#' @param rng3 Random value between 0 and 1
+#' @param rng4 Random value between 0 and 1
+#' @param rng5 Random value between 0 and 1
+#' @param rng6 Random value between 0 and 1
+#' @param rng7 Random value between 0 and 1
+#' @param rng8 Random value between 0 and 1
+#'
+#' @return A list including spectral of IOPs and key parameters
+#'
+#' @export
+#' @rdname benchmark_IOP
+#'
+L23_IOP <-
+  function(aph, wavelen = wavelen_IOP,
+           rng1 = runif(1), rng2 = runif(1), rng3 = runif(1),
+           rng4 = runif(1), rng5 = runif(1), rng6 = runif(1),
+           rng7 = runif(1), rng8 = runif(1)
+  ) {
+
+    if(length(wavelen) != length(aph)) stop("aph has a different length of wavelength!")
+
+    aph440 = approx(wavelen, aph, xout = 440)$y
+
+    Chl  = (aph440 / 0.05582)
+
+    p1   = 0.79 * log10(aph440) - 0.37
+    r    = -0.2 +  0.3 * rng1                                                      # rng1
+    sg   = (0.02 - 0.01) * rng2 + 0.01                                             # rng2
+    p2   = 0.1 + (0.4 * rng3 * aph440) / (0.05 + aph440)                           # rng3
+    sd   = (0.015 - 0.007) * rng4 + 0.007                                          # rng4
+    p3   = (0.3 - 0.03) * rng5 + 0.03                                              # rng5
+    scph = -0.4 + (1.6 + 1.2 * rng6) / (1 + Chl^0.5)                               # rng6
+    p4   = (0.16668 - 0.016668) * rng7 + 0.016668                                  # rng7
+    sbd  = -0.5 + (2 + 1.2 * rng8) / (1 + Chl^0.5)                                 # rng8
+
+    ag440 = 10^(p1 + r)
+    ag    = ag440 * exp(-sg*(wavelen - 440))
+
+    ad440 = p2 * aph440
+    ad    = ad440 * exp(-sd*(wavelen - 440))
+
+    cph550 = p3 * aph440 / 0.05582 # this has better outputs
+    cph    = cph550 * (550/wavelen) ^ scph
+    bph    = cph - aph
+
+    bd550 = p4 * aph440 / 0.05582 # this has better outputs
+    bd    = bd550 * (550/wavelen) ^ sbd
+    bph   = cph - aph
+    bbph  = 0.01 * bph
+    bbd   = 0.018 * bd
+
+    result <- list(
+
+      spec = list(
+        wavelen = wavelen,
+        ag  = ag,
+        ad  = ad,
+        aph = aph,
+        ap  = aph + ad,
+        agp = aph + ad + ag,
+        bd  = bd,
+        bph = bph,
+        bp  = bd + bph,
+        bbd = bbd,
+        bbph = bbph,
+        bbp = bbd + bbph,
+        cp  = aph + ad + bd + bph,
+        cgp = aph + ad + bd + bph + ag
+      ),
+
+      parm = list(
+        p1 = p1, p2 = p2, p3 = p3, p4 = p4,
+        Chl = Chl,
+        r = r, sg = sg, sd = sd, scph = scph,
+        sbd = sbd, aph440 = aph440,
+        ag440 = ag440, ad440 = ad440,
+        cph550 = cph550, bd550 = bd550
+      )
+
+    )
+
+    return(result)
+
+  }
+
+
+#' @param Chl Chlorophyll a concentration, as a proxy of biomass concentration
+#'   of phytoplankton, in the unit \[mg/m^3\]
+#' @param ag440 CDOM absorption coefficient at 440 nm, as a proxy of
+#'   concentration of CDOM (or called gelbstoff), in the unit \[m^-1\]
+#' @param TSM Total suspended matter concentration in the unit \[g/m3\]
+#'
+#' @rdname benchmark_IOP
+#'
+R18_IOP <- function(Chl, ag440, TSM, wavelen = wavelen_IOP) {
+
+  MSS <- attr(DavidMcKee, "MSS function")(TSM, Chl)
+
+  wavelen_input <- wavelen
+
+  spec_lib <-
+    c(a = "astar", b = "bstar") %>%
+    lapply(function(x) {
+      DavidMcKee[[x]] %>%
+        melt.data.table(id.vars = 1) %>%
+        .[,{
+          approx(.SD$wavelen, .SD$value, wavelen_input, rule = 1) %>%
+            setNames(., c("wavelen", "value")) %>%
+            as.data.table()
+        }, by = .(variable)] %>%
+        dcast.data.table(wavelen~variable, value.var = "value")
+    })
+
+  tmp <-
+    list(
+      aph = spec_lib$a$aph %*% t(Chl),
+      ag  = spec_lib$a$aCDOM %*% t(ag440),
+      abd = spec_lib$a$abd %*% t(Chl),
+      amd = spec_lib$a$amd %*% t(MSS)
+    )
+  a <-
+    1:length(tmp) %>%
+    lapply(function(i) {
+      comp = names(tmp)[i]
+      r <- tmp[[i]] %>%
+        as.data.table() %>%
+        setNames(., as.character(1:ncol(.)))
+      r <- cbind(wavelen, r)
+      r %>%
+        melt.data.table(
+          id.vars = 1,
+          variable.name = "ID",
+          variable.factor = FALSE,
+          value.name = comp
+        )
+    }) %>%
+    Reduce(function(x, y) data.table::merge.data.table(x, y, by = c("wavelen", "ID")), .)
+  a$ad  <- with(a, abd + amd)
+  a$ap  <- with(a, aph + ad)
+  a$agp <- with(a, ap + ag)
+
+
+  tmp <-
+    list(
+      bph = spec_lib$b$bph %*% t(Chl),
+      bd = spec_lib$b$bmd %*% t(MSS),
+      bbph = spec_lib$b$bbph %*% t(Chl),
+      bbd = spec_lib$b$bbmd %*% t(MSS)
+    )
+  b <-
+    1:length(tmp) %>%
+    lapply(function(i) {
+      comp = names(tmp)[i]
+      r <- tmp[[i]] %>%
+        as.data.table() %>%
+        setNames(., as.character(1:ncol(.)))
+      r <- cbind(wavelen, r)
+      r %>%
+        melt.data.table(
+          id.vars = 1,
+          variable.name = "ID",
+          variable.factor = FALSE,
+          value.name = comp
+        )
+    }) %>%
+    Reduce(function(x, y) data.table::merge.data.table(x, y, by = c("wavelen", "ID")), .)
+
+  b$bp <- with(b, bph + bd)
+  b$bbp <- with(b, bbph + bbd)
+
+  spec <-
+    merge.data.table(a, b, by = c("wavelen", "ID"), all = TRUE)
+
+  parm <-
+    list(
+      Chl = Chl,
+      TSM = TSM,
+      MSS = MSS,
+      ag440 = ag440
+    )
+
+  result <- list(spec = spec, parm = parm)
+
+  return(result)
+
+}
+
+
+

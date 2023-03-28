@@ -1,0 +1,19 @@
+Package: IOPmodel
+Title: Model inherent optical properties from component concentrations
+Version: 0.1
+Authors@R: 
+    person("Shun", "Bi", , "Shun.Bi@hereon.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-2668-5808"))
+Description: Supplyment code package for our paper Bi et al. (2023) 
+  "Bio-geo-optical modeling of natural waters" submitted to "Fontiers in Marine 
+  Science". The package includes our proposed IOP model and also other benchmark 
+  models.  
+License: file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
+Imports: 
+    data.table,
+    magrittr
+Depends: 
+    R (>= 3.5.0)
