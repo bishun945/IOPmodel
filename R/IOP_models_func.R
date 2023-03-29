@@ -342,6 +342,7 @@ generate_aphs <- function(Chl,
   }
 
   aphs_676_new <- aph676 / Chl
+  if(Chl == 0) aphs_676_new <- 1
 
   aphs_mat <- as.matrix(phytodive_iop$aphs[, -1])
   aphs_676 <-
