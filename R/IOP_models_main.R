@@ -45,7 +45,7 @@ IOP_four_comp <- function(
     A_d = NULL, G_d = NULL,
     lib_cdom = TRUE,
     aw_smooth = FALSE,
-    ag_seed = 1234,
+    ag_seed = NULL,
     ...
 ) {
 
@@ -126,6 +126,7 @@ IOP_four_comp <- function(
 
 
 #' @rdname IOP_model
+#' @param seed Seed number of the two-term model
 #' @export
 #' @examples
 #' str(IOP_two_comp(Chl = 1))
@@ -134,10 +135,14 @@ IOP_two_comp <- function(
     frac_phyto = NULL,
     Temp = 20, Sal = 15,
     wavelen = wavelen_IOP,
-    aw_smooth = FALSE
+    aw_smooth = FALSE,
+    seed = NULL,
+    ...
 ) {
 
   if(is.null(frac_phyto)) frac_phyto <- rand_frac(case = 1, Chl)
+
+  set.seed(seed)
 
   ## water ##
 
@@ -155,7 +160,7 @@ IOP_two_comp <- function(
   ## ph ##
 
   # Hereon blending model
-  res_aphs <- generate_aphs(Chl)
+  res_aphs <- generate_aphs(Chl, ...)
   list_ph <-
     1:length(res_aphs) %>%
     lapply(function(i) {

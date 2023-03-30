@@ -21,7 +21,7 @@ IOP_four_comp(
   G_d = NULL,
   lib_cdom = TRUE,
   aw_smooth = FALSE,
-  ag_seed = 1234,
+  ag_seed = NULL,
   ...
 )
 
@@ -31,7 +31,9 @@ IOP_two_comp(
   Temp = 20,
   Sal = 15,
   wavelen = wavelen_IOP,
-  aw_smooth = FALSE
+  aw_smooth = FALSE,
+  seed = NULL,
+  ...
 )
 }
 \arguments{
@@ -74,6 +76,8 @@ concentration of CDOM (or called gelbstoff), in the unit [m^-1]}
 the same outputs.}
 
 \item{...}{Parameters passed to \code{IOP_ph_B22_C2}}
+
+\item{seed}{Seed number of the two-term model}
 }
 \value{
 A list including spectral of IOPs and key parameters
