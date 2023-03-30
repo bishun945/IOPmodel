@@ -7,11 +7,19 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
 The goal of `IOPmodel` is to compute inherent optical properties (IOPs)
 from component concentrations, i.e., Chlorophyll *a* concentration,
 suspended matter concentration, and CDOM absorption.
+
+## Webtool
+
+Try our webtool to run this model:
+<https://bishun945.shinyapps.io/IOPmodel/>
+
+![](man/figures/GUI.png)
 
 ## Installation
 
