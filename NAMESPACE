@@ -3,7 +3,6 @@
 export(IOP_four_comp)
 export(IOP_two_comp)
 export(L23_IOP)
-export(WOPP)
 importFrom(data.table,":=")
 importFrom(data.table,.BY)
 importFrom(data.table,.EACHI)

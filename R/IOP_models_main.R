@@ -20,6 +20,7 @@
 #'   \code{TRUE}
 #' @param aw_smooth Option to smooth the pure water absorption. Default as
 #'   \code{FALSE}
+#' @param aw_version Pure water absorption version: 1, 2, and 3
 #' @param ag_seed Random seed for ag model. Default as 1234. Fixed to reproduce
 #'   the same outputs.
 #' @param ... Parameters passed to \code{IOP_ph_B22_C2}
@@ -45,6 +46,7 @@ IOP_four_comp <- function(
     A_d = NULL, G_d = NULL,
     lib_cdom = TRUE,
     aw_smooth = FALSE,
+    aw_version = 3,
     ag_seed = NULL,
     ...
 ) {
@@ -67,7 +69,7 @@ IOP_four_comp <- function(
     list_cdom  <- IOP_cdom_B22_C2(ag440, S_cdom, wavelen = wavelen)
   }
 
-  list_WOPP  <- WOPP(Temp, Sal, wavelen = wavelen)
+  list_WOPP  <- WOPP(Temp, Sal, wavelen = wavelen, aw_version = aw_version)
 
   if(aw_smooth) {
     list_WOPP$a <- as.data.table(list_WOPP) %>%
@@ -136,6 +138,7 @@ IOP_two_comp <- function(
     Temp = 20, Sal = 15,
     wavelen = wavelen_IOP,
     aw_smooth = FALSE,
+    aw_version = 3,
     seed = NULL,
     ...
 ) {
@@ -146,7 +149,7 @@ IOP_two_comp <- function(
 
   ## water ##
 
-  list_WOPP  <- WOPP(Temp, Sal, wavelen = wavelen)
+  list_WOPP  <- WOPP(Temp, Sal, wavelen = wavelen, aw_version = aw_version)
 
   if(aw_smooth) {
     list_WOPP$a <- as.data.table(list_WOPP) %>%

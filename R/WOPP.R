@@ -1,28 +1,7 @@
-#' WOPP
-#'
-#' @param Temp Temperature \[degC\]
-#' @param Sal Salinity \[PSU\]
-#' @param wavelen Wavelength \[nm\]
-#'
-#' @note
-#'
-#' The WOPP code is wrapper from Schoenfeld's codes
-#'
-#' This code is copied from https://github.com/bishun945/RrsTrans/blob/master/R/WOPP.R
-#'
-#' @return A list of IOPs of pure water
-#' @export
-#'
-#' @references
-#'
-#' Röttgers, R, R Doerffer, D McKee, and W Schönfeld. “The Water Optical
-#' Properties Processor (WOPP): Pure Water Spectral Absorption, Scattering and
-#' Real Part of Refractive Index Model.” Technical Report No WOPP-ATBD/WRD6,
-#' 2016. https://calvalportal.ceos.org/tools.
-#'
-#' @examples
-#' WOPP(Temp = 25, Sal = 10)
-WOPP <- function(Temp = 25, Sal = 10, wavelen = seq(350, 900, 5)) {
+# Wrapper from Schoenfeld's codes
+
+#' @noRd
+WOPP <- function(Temp = 25, Sal = 10, wavelen = wavelen_IOP, aw_version = 3) {
 
   # WOPP_path <- "/WOPP/"
 
@@ -61,31 +40,16 @@ WOPP <- function(Temp = 25, Sal = 10, wavelen = seq(350, 900, 5)) {
 
   }
 
-  absorption <- function(fn = NULL, version = 3) {
+  absorption <- function(fn = NULL, version = aw_version) {
 
     # absorption 300 - 4000 nm
     # Temp coeff 300 - 4000 nm
     # Sal coeff 300 - 4000 nm
 
     if(!(version %in% c(1, 2, 3))) stop("Version should be 1, 2, or 3")
+    version_sel <- version
 
-    # if(FALSE) {
-    #
-    #   version = 3
-    #   fn = file.path(WOPP_path, sprintf("purewater_abs_coefficients_v%s.dat", version))
-    #
-    #   WOPP_purewater_abs_coefficients_v3 <-
-    #     read.table(
-    #       fn,
-    #       comment.char = "%",
-    #       col.names = c("wl", "a0", "T_coeff", "S_coeff", "a0_err", "T_err", "S_err")
-    #     )
-    #
-    #   save(WOPP_purewater_abs_coefficients_v3, file = "./data/WOPP_purewater_abs_coefficients_v3.rda")
-    #
-    # }
-
-    d <- WOPP_purewater_abs_coefficients_v3
+    d <- WOPP_purewater_abs_coefficients[version == version_sel]
 
     idx <- which(d$wl >= aw & d$wl <= ew)
 
@@ -337,7 +301,7 @@ WOPP <- function(Temp = 25, Sal = 10, wavelen = seq(350, 900, 5)) {
   nw_approx <- approx(wl, nw, wavelen)$y
 
   return(list(wavelen = wavelen, a = water_abs_approx, b = water_sca_approx,
-              Temp = Temp, Sal = Sal, nw = nw_approx))
+              Temp = Temp, Sal = Sal, nw = nw_approx, aw_version = aw_version))
 
 }
 
