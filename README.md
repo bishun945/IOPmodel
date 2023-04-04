@@ -19,7 +19,7 @@ suspended matter concentration, and CDOM absorption.
 Try our webtool to run this model:
 <https://bishun945.shinyapps.io/IOPmodel/>
 
-![](man/figures/GUI.png)
+![](man/figures/GUI_pic.png)
 
 ## Installation
 
@@ -45,6 +45,8 @@ library(ggplot2)
 library(magrittr)
 
 gen_case <- function(Chl, ISM, ag440) {
+  
+  set.seed(4)
   
   res_IOP <- IOP_four_comp(Chl = Chl, ag440 = ag440, ISM = ISM)
   result <- 
@@ -127,10 +129,8 @@ show_spec <- function(tmp) {
 
 }
 
-set.seed(123)
-
 patchwork::wrap_plots(
-  show_spec(gen_case(Chl = 0.14,   ISM = 0.01, ag440 = 0.0115)),
+  show_spec(gen_case(Chl = 0.14,   ISM = 0.01, ag440 = 0.0010)),
   show_spec(gen_case(Chl = 9.36,   ISM = 0.10, ag440 = 0.0303)),
   show_spec(gen_case(Chl = 105.26, ISM = 0.16, ag440 = 0.2566)),
   show_spec(gen_case(Chl = 30.11,  ISM = 20.0, ag440 = 0.5231)),
