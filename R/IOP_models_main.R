@@ -107,7 +107,8 @@ IOP_four_comp <- function(
   list_output$bbt  = with(list_output, bbp + bbw)
 
   # Rrs by Lee et al 2011
-  list_output$Rrs_L11 = with(list_output, IOP2AOP_Lee_11(bbw, bbp, at, bbt))
+  list_output$Rrs_L11  = with(list_output, IOP2AOP_Lee_11(bbw, bbp, at, bbt))
+  list_output$Rrs_AM03 = with(list_output, IOP2AOP_Albert_Mobley_03(a = at, bb = bbt))
 
   r <- list(
     spec = list_output,
@@ -248,6 +249,7 @@ IOP_two_comp <- function(
 
   # Rrs by Lee et al 2011
   spec$Rrs_L11 = with(spec, IOP2AOP_Lee_11(bbw, bbp, at, bbt))
+  spec$Rrs_AM03 = with(spec, IOP2AOP_Albert_Mobley_03(a = at, bb = bbt))
 
   parm <- list(
     Chl = Chl,

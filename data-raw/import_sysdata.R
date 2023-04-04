@@ -6,30 +6,43 @@ require(data.table)
 rm(list = ls())
 
 # for WOPP
-load("~/Documents/GitHub/HEShun/data/WOPP_purewater_abs_coefficients.rda")
 load("~/Documents/GitHub/HEShun/data/WOPP_computed_refri_T27_S0_180_4000nm.rda")
 
-# smooth it
+load("~/Documents/GitHub/HEShun/data/WOPP_purewater_abs_coefficients.rda")
+
 WOPP_purewater_abs_coefficients <-
   WOPP_purewater_abs_coefficients %>%
-    as.data.table() %>%
-    .[, {
-      tmp <- copy(.SD)
-      smoothed_S_coeff_pred <-
-        loess(data = tmp[wl <= 506], S_coeff ~ wl, span = 0.3) %>%
-        predict()
-      wl_used <- tmp[wl <= 506, wl]
-      tmp[, S_coeff_raw := S_coeff]
-      offset <-
-        tmp[wl == 500, S_coeff_raw] -
-        smoothed_S_coeff_pred[wl_used == 500]
-      tmp[between(wl, 380, 500), S_coeff := (smoothed_S_coeff_pred[between(wl_used, 380, 500)] + offset)]
-      tmp[between(wl, NA, 394), S_coeff := 0]
-      tmp$S_coeff <-
-        loess(data = tmp, S_coeff ~ wl, span = 0.003) %>%
-        predict()
-      tmp
-    }, by = .(version)]
+  .[, {
+    # tmp <- WOPP_purewater_abs_coefficients[version == 3]
+    tmp <- copy(.SD)
+    smooth_a0 <-
+      loess(data = tmp, a0 ~ wl, span = 0.009) %>%
+      predict()
+    tmp[, a0_raw := a0]
+    tmp[, a0 := smooth_a0]
+  }, by = .(version)]
+
+# smooth Phi_Sal
+WOPP_purewater_abs_coefficients <-
+  WOPP_purewater_abs_coefficients %>%
+  as.data.table() %>%
+  .[, {
+    tmp <- copy(.SD)
+    smoothed_S_coeff_pred <-
+      loess(data = tmp[wl <= 506], S_coeff ~ wl, span = 0.3) %>%
+      predict()
+    wl_used <- tmp[wl <= 506, wl]
+    tmp[, S_coeff_raw := S_coeff]
+    offset <-
+      tmp[wl == 500, S_coeff_raw] -
+      smoothed_S_coeff_pred[wl_used == 500]
+    tmp[between(wl, 380, 500), S_coeff := (smoothed_S_coeff_pred[between(wl_used, 380, 500)] + offset)]
+    tmp[between(wl, NA, 394), S_coeff := 0]
+    tmp$S_coeff <-
+      loess(data = tmp, S_coeff ~ wl, span = 0.003) %>%
+      predict()
+    tmp
+  }, by = .(version)]
 
 # WOPP_purewater_abs_coefficients %>%
 #     # .[version == 3 & between(wl, NA, 900)] %>%
@@ -82,7 +95,7 @@ rm(list = ls())
 devtools::document()
 
 
-# test
+###### test ######
 
 # sub modules
 str(WOPP())

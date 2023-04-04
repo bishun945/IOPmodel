@@ -286,6 +286,8 @@ generate_aphs <- function(Chl,
                           gamma_ph676  = c(NA,   0.00, 0.00, 0.00, 0.00, NA,   NA),
                           vary_cph = FALSE,
                           aphs_fun = calc_aph676,
+                          phytodive_iop_list = phytodive_iop,
+                          a_frac = c(1, 1, 1, 1, 1, 1, 1),
                           ...) {
 
   # Some albedo reference
@@ -302,7 +304,7 @@ generate_aphs <- function(Chl,
   if (any(albedo_ph676 > 1) | any(albedo_ph676 < 0)) {
     stop("albedo of phytoplankton at 676 nm should between 0 and 1")
   }
-  names(albedo_ph676) <- names(phytodive_iop$name_phyto)
+  names(albedo_ph676) <- names(phytodive_iop_list$name_phyto)
 
   if (vary_cph) {
     albedo_ph676_new <- albedo_ph676
@@ -316,7 +318,7 @@ generate_aphs <- function(Chl,
   if (any(gamma_ph676 < -1, na.rm = TRUE)) {
     stop("Gamma of phytoplankton attenuation normalized at 676 nm should > -1")
   }
-  names(gamma_ph676) <- names(phytodive_iop$name_phyto)
+  names(gamma_ph676) <- names(phytodive_iop_list$name_phyto)
 
   if (vary_cph) {
     gamma_ph676_new <- gamma_ph676
@@ -344,23 +346,23 @@ generate_aphs <- function(Chl,
   aphs_676_new <- aph676 / Chl
   if(Chl == 0) aphs_676_new <- 1
 
-  aphs_mat <- as.matrix(phytodive_iop$aphs[, -1])
+  aphs_mat <- as.matrix(phytodive_iop_list$aphs[, -1])
   aphs_676 <-
-    unlist(phytodive_iop$aphs[phytodive_iop$aphs$wv == 676, -1])
+    unlist(phytodive_iop_list$aphs[phytodive_iop_list$aphs$wv == 676, -1])
   aphs_mat_norm <-
     aphs_mat / vec_to_mat(aphs_676, n = nrow(aphs_mat))
   aphs_mat_new  <-
     aphs_mat_norm * aphs_676_new # using new aphs from Chl
 
-  cphs_mat <- as.matrix(phytodive_iop$cphs[, -1])
+  cphs_mat <- as.matrix(phytodive_iop_list$cphs[, -1])
   cphs_676 <-
-    unlist(phytodive_iop$cphs[phytodive_iop$cphs$wv == 676, -1])
+    unlist(phytodive_iop_list$cphs[phytodive_iop_list$cphs$wv == 676, -1])
   cphs_mat_norm <-
     cphs_mat / vec_to_mat(cphs_676, n = nrow(cphs_mat), by = 1) # normalized at cph676 - shape
   # Find group to be changed for the shape
   PG_TBC <- which(!is.na(gamma_ph676))
   for (i in PG_TBC) {
-    cphs_mat_norm[, i] <- (676 / phytodive_iop$cphs$wv) ^ gamma_ph676[i]
+    cphs_mat_norm[, i] <- (676 / phytodive_iop_list$cphs$wv) ^ gamma_ph676[i]
   }
   coef_lin <-
     aphs_676_new / (1 - albedo_ph676) # the coefficients in Eq 16 - magnitude
@@ -368,19 +370,24 @@ generate_aphs <- function(Chl,
     cphs_mat_norm * vec_to_mat(coef_lin, n = nrow(cphs_mat), by = 1)
   bphs_mat_new <- cphs_mat_new - aphs_mat_new
 
-  aphs <- data.table(wv = phytodive_iop$aphs$wv, aphs_mat_new)
-  bphs <- data.table(wv = phytodive_iop$bphs$wv, bphs_mat_new)
-  cphs <- data.table(wv = phytodive_iop$cphs$wv, cphs_mat_new)
+  # assumption for reducing cell absorption (e.g. PIC bloom)
+  aphs_mat_new <- aphs_mat_new * vec_to_mat(a_frac, n = nrow(aphs_mat_new), by = 1)
+  cphs_mat_new <- aphs_mat_new + bphs_mat_new # compensate attenuation back
+
+  aphs <- data.table(wv = phytodive_iop_list$aphs$wv, aphs_mat_new)
+  bphs <- data.table(wv = phytodive_iop_list$bphs$wv, bphs_mat_new)
+  cphs <- data.table(wv = phytodive_iop_list$cphs$wv, cphs_mat_new)
 
   r <- list(aphs = aphs,
             bphs = bphs,
             cphs = cphs)
 
   parm <- list(
-    aph676 = aph676,
-    albedo_ph676 = albedo_ph676,
-    gamma_ph676 = gamma_ph676,
-    vary_cph = vary_cph
+    aph676       =  aph676,
+    albedo_ph676 =  albedo_ph676,
+    gamma_ph676  =  gamma_ph676,
+    vary_cph     =  vary_cph,
+    a_frac       =  a_frac
   )
 
   attr(r, "parm") <- parm

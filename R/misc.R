@@ -33,6 +33,15 @@ vec_to_mat <- function(x, n, by = 1) {
 
 }
 
+
+#' @noRd
+def_frac <- function(name, value) {
+  v <- numeric(length = length(phytodive_iop$name_phyto))
+  names(v) <- names(phytodive_iop$name_phyto)
+  v[name] <- value
+  v
+}
+
 #### IOP to Rrs ####
 
 #' @noRd
