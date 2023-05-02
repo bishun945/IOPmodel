@@ -20,7 +20,6 @@ IOP_four_comp(
   A_d = NULL,
   G_d = NULL,
   lib_cdom = TRUE,
-  aw_smooth = FALSE,
   aw_version = 3,
   ag_seed = NULL,
   ...
@@ -32,7 +31,6 @@ IOP_two_comp(
   Temp = 20,
   Sal = 15,
   wavelen = wavelen_IOP,
-  aw_smooth = FALSE,
   aw_version = 3,
   seed = NULL,
   ...
@@ -70,9 +68,6 @@ concentration of CDOM (or called gelbstoff), in the unit [m^-1]}
 
 \item{lib_cdom}{Option to use the library of CDOM absorption. Default as
 \code{TRUE}}
-
-\item{aw_smooth}{Option to smooth the pure water absorption. Default as
-\code{FALSE}}
 
 \item{aw_version}{Pure water absorption version: 1, 2, and 3}
 

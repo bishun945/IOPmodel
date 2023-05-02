@@ -552,7 +552,8 @@ IOP_cdom_B22_C2_lib <- function(
   r <-
     list(
       wavelen = wavelen,
-      acdom = ag440 * ag_norm
+      acdom = ag440 * ag_norm,
+      ag_seed = ag_seed
     )
 
   parm <- list(ag440 = ag440)

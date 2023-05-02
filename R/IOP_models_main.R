@@ -18,8 +18,6 @@
 #' @param G_d Power law exponent of spectral attenuation of detritus
 #' @param lib_cdom Option to use the library of CDOM absorption. Default as
 #'   \code{TRUE}
-#' @param aw_smooth Option to smooth the pure water absorption. Default as
-#'   \code{FALSE}
 #' @param aw_version Pure water absorption version: 1, 2, and 3
 #' @param ag_seed Random seed for ag model. Default as 1234. Fixed to reproduce
 #'   the same outputs.
@@ -45,7 +43,6 @@ IOP_four_comp <- function(
     wavelen = wavelen_IOP,
     A_d = NULL, G_d = NULL,
     lib_cdom = TRUE,
-    aw_smooth = FALSE,
     aw_version = 3,
     ag_seed = NULL,
     ...
@@ -66,15 +63,10 @@ IOP_four_comp <- function(
   if(lib_cdom) {
     list_cdom <- IOP_cdom_B22_C2_lib(ag440, wavelen = wavelen, ag_seed = ag_seed)
   } else {
-    list_cdom  <- IOP_cdom_B22_C2(ag440, S_cdom, wavelen = wavelen)
+    list_cdom <- IOP_cdom_B22_C2(ag440, S_cdom, wavelen = wavelen)
   }
 
   list_WOPP  <- WOPP(Temp, Sal, wavelen = wavelen, aw_version = aw_version)
-
-  if(aw_smooth) {
-    list_WOPP$a <- as.data.table(list_WOPP) %>%
-      loess(data = ., a ~ wavelen,  span = 0.04) %>% predict()
-  }
 
   list_output <- list(
     wavelen = list_ph$wavelen,
@@ -112,13 +104,19 @@ IOP_four_comp <- function(
 
   r <- list(
     spec = list_output,
-    parm = list(Chl = Chl, ag440 = ag440, ISM = ISM,
-                Temp = Temp, Sal = Sal,
-                qt_bd = qt_bd, qt_md = qt_md,
+    parm = list(Chl   = Chl,
+                ag440 = ag440,
+                ISM   = ISM,
+                Temp  = Temp,
+                Sal   = Sal,
+                qt_bd = attr(list_d, "parm")$qt_bd,
+                qt_md = attr(list_d, "parm")$qt_md,
                 frac_phyto = frac_phyto,
-                S_cdom = S_cdom,
-                bbdtilde = bbdtilde,
-                bbphtilde = bbphtilde)
+                S_cdom    = S_cdom,
+                bbdtilde  = bbdtilde,
+                bbphtilde = bbphtilde,
+                aw_version = aw_version,
+                ag_seed = ag_seed)
   )
 
   attr(r, "attr_aph676") <- attr_aph676
@@ -138,7 +136,6 @@ IOP_two_comp <- function(
     frac_phyto = NULL,
     Temp = 20, Sal = 15,
     wavelen = wavelen_IOP,
-    aw_smooth = FALSE,
     aw_version = 3,
     seed = NULL,
     ...
@@ -151,11 +148,6 @@ IOP_two_comp <- function(
   ## water ##
 
   list_WOPP  <- WOPP(Temp, Sal, wavelen = wavelen, aw_version = aw_version)
-
-  if(aw_smooth) {
-    list_WOPP$a <- as.data.table(list_WOPP) %>%
-      loess(data = ., a ~ wavelen,  span = 0.04) %>% predict()
-  }
 
   aw <- list_WOPP$a
   bw <- list_WOPP$b
@@ -268,7 +260,9 @@ IOP_two_comp <- function(
     gamma_d = gamma_d,
     p4 = p4,
     bd550 = bd550,
-    bbdtilde = bbdtilde
+    bbdtilde = bbdtilde,
+    aw_version = aw_version,
+    seed = seed
   )
 
   result <- list(
