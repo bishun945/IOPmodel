@@ -115,6 +115,7 @@ IOP_four_comp <- function(
                 G_d   = attr(list_d, "parm")$G_cd,
                 Albedo550_d = attr(list_d, "parm")$Albedo_550,
                 frac_phyto = frac_phyto,
+                ph_parm = attr(list_ph, "attr_ph_parm"),
                 S_cdom    = S_cdom,
                 bbdtilde  = bbdtilde,
                 bbphtilde = bbphtilde,

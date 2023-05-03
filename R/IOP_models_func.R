@@ -188,8 +188,10 @@ IOP_ph_B22_C2 <- function(Chl,
     aphs <- siop_ph$aphs
     bphs <- siop_ph$bphs
     attr_aph676 <- attr(siop_ph, "attr_aph676")
+    attr_ph_parm <- attr(siop_ph, "parm")
   } else {
     attr_aph676 <- NULL
+    attr_ph_parm <- NULL
   }
 
   # aphs <- phytodive_iop$aphs
@@ -239,6 +241,8 @@ IOP_ph_B22_C2 <- function(Chl,
   attr(r, "parm") <- parm
 
   attr(r, "attr_aph676") <- attr_aph676
+
+  attr(r, "attr_ph_parm") <- attr_ph_parm
 
   return(r)
 
