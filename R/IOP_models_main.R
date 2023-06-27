@@ -31,6 +31,22 @@
 #' @examples
 #'
 #' str(IOP_four_comp(Chl = 1, ag440 = 0.18, ISM = 1))
+#'
+#' @references
+#'
+#' Bi S, Hieronymi M, Röttgers R. Bio-geo-optical modelling of natural
+#' waters[J]. Frontiers in Marine Science, 2023, 10: 1196352.
+#'
+#' Röttgers, R, R Doerffer, D McKee, and W Schönfeld. “The Water Optical
+#' Properties Processor (WOPP): Pure Water Spectral Absorption, Scattering and
+#' Real Part of Refractive Index Model.” Technical Report No WOPP-ATBD/WRD6,
+#' 2016. https://calvalportal.ceos.org/tools.
+#'
+#' Röttgers, Rüdiger, Shun Bi, Henning Burmester, Kerstin Heymann, Martin
+#' Hieronymi, Hajo Krasemann, and Wolfgang Schönfeld. “A Data Set of Water
+#' Inherent Optical Properties and Concentrations of Water Constituents from the
+#' German Bight and Adjacent Regions.” PANGAEA, 2022.
+#'
 IOP_four_comp <- function(
     Chl = 1,
     ag440 = 0.18,
