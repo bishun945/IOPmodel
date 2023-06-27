@@ -274,6 +274,7 @@ IOP_two_comp <- function(
     p2 = p2,
     p4 = p4,
     acdom440 = ag440,
+    ag440 = ag440,
     Sag = Sag,
     ad440 = ad440,
     Sad = Sad,
