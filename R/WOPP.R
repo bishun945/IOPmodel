@@ -27,7 +27,8 @@ WOPP <- function(Temp = 25, Sal = 10, wavelen = wavelen_IOP, aw_version = 3) {
     # }
 
     d <- WOPP_computed_refri_T27_S0_180_4000nm
-    idx <- which(d$wl >= aw & d$wl <= ew)
+    # idx <- which(d$wl >= aw & d$wl <= ew)
+    idx <- which(d$wl >= (aw-1) & d$wl <= (ew+1))
     refri_err <- numeric(nrow(d))
     refri_err[d$wl < 700] <- 0.00003
     refri_err[d$wl >= 700] <- 0.0005
@@ -51,7 +52,8 @@ WOPP <- function(Temp = 25, Sal = 10, wavelen = wavelen_IOP, aw_version = 3) {
 
     d <- WOPP_purewater_abs_coefficients[version == version_sel]
 
-    idx <- which(d$wl >= aw & d$wl <= ew)
+    # idx <- which(d$wl >= aw & d$wl <= ew)
+    idx <- which(d$wl >= (aw-1) & d$wl <= (ew+1))
 
     d <- d[idx,]
 
