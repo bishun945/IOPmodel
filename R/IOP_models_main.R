@@ -105,6 +105,9 @@ IOP_four_comp <- function(
   # list_output
 
   # bbtilde blend
+  # 05 March 2024
+  # TODO: this is a bug for calculating bbph as it is not equivalent as sum of bph * bb_o_b
+  # TODO: RR suggests use 0.018 for bb_o_b of Cocco instead of 0.007 based on his measurements
   bbphtilde <- sum(frac_phyto * phytodive_iop$bbtilde_phyto)
 
   # bb spectra
