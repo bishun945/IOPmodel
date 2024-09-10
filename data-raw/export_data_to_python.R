@@ -7,11 +7,15 @@ load("./R/sysdata.rda")
 
 library(data.table)
 
-output_dir = "~/Documents/GitHub/pyIOPmodel"
+output_dir = "~/Documents/GitHub/pyIOPmodel/IOPmodel"
 
-fwrite(ag_lib, file.path(output_dir, "data", "ag_hat_lib.csv"))
+fwrite(ag_lib, file.path(output_dir, "CDOM/data", "ag_hat_lib.csv"))
 
-fwrite(coef_exp_ads, file.path(output_dir, "data", "coef_exp_ads.csv"))
+coef_exp_ads_comp <- rbind(
+  coef_exp_ads$abds %>% dplyr::mutate(comp = "abds", .before = 1),
+  coef_exp_ads$amds %>% dplyr::mutate(comp = "amds", .before = 1)
+)
+fwrite(coef_exp_ads_comp, file.path(output_dir, "DETRITUS/data", "coef_exp_ads.csv"))
 
 fwrite(frac_phyto_lib, file.path(output_dir, "data", "frac_phyto_lib.csv"))
 
