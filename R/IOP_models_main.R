@@ -143,6 +143,7 @@ IOP_four_comp <- function(
   )
 
   attr(r, "attr_aph676") <- attr_aph676
+  attr(r, "warn_neg_bd") <- attr(list_d, "warn_neg_bd")
 
   r
 

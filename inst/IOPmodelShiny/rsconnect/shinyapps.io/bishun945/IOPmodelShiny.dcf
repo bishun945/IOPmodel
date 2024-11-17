@@ -1,0 +1,12 @@
+name: IOPmodelShiny
+title: IOPmodelShiny
+username: bishun945
+account: bishun945
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13164437
+bundleId:
+url: https://bishun945.shinyapps.io/IOPmodelShiny/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

@@ -98,9 +98,12 @@ IOP_d_B22_C2 <- function(ISM,
   cd <- cd550 * (wavelen / 550) ^ -G
   bd <- cd - ad
 
+  warn_neg_bd = FALSE
+
   if (any(bd < 0)) {
     if (use_qt) {
       cat("Negative bd! Rational random values will be used!\n")
+      warn_neg_bd = TRUE
     }
 
     while (any(bd < 0)) {
@@ -167,6 +170,7 @@ IOP_d_B22_C2 <- function(ISM,
   )
 
   attr(r, "parm") <- parm
+  attr(r, "warn_neg_bd") <- warn_neg_bd
 
   return(r)
 
