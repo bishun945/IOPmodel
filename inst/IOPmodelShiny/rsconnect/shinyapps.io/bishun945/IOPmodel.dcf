@@ -5,7 +5,7 @@ account: bishun945
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8718495
-bundleId:
+bundleId: 9375705
 url: https://bishun945.shinyapps.io/IOPmodel/
 asMultiple: FALSE
 asStatic: FALSE
